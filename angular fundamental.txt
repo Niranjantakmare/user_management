@@ -1,0 +1,318 @@
+Angular Fundamental-
+
+
+Communicating with child component from parent component
+
+<event-thumbail [event]='event1'></event-thumbail>
+
+Communicating with Parent component from child component
+
+import {output,input } from ''
+import {EventEmitter } from '@angular/events';
+
+@Input event:any;
+
+@Output eventClick= new EventEmitter;
+
+handleClick(){
+this.eventClick.emit('foo');
+ 
+in parent component-
+<event-thumbail (eventClick)="handleEventClicked($event)" [event]='event1'></event-thumbail>
+
+in parent ts file add method-
+ handleEventClicked(){
+ console.log('received : ',data);
+ }
+
+Using Template variables to Interact with child component.
+
+<event-thumbail #thumbails [event]='event1'></event-thumbail>
+
+use template reference variable to access public properties and method of child component.
+it is used for call methods of child component or to bind to data in a child commonent.
+
+<button class="btn btn-primary" (click)="thumbails.logFoo()">Log me some foo</button>
+
+#thumbails - it is reference template variable which communicate with child component.
+Template reference variable- it allow you to specify a variable name that to component, and then 
+you can  access any public properties or methods on that components. using that variable.
+
+access child  variable with  template reference variable for example-
+
+in child component
+
+someVariable:any = 'Some value to variable';
+
+in  Parent component-
+
+<h2>{{ thumbail.someVariable }}<h2>
+
+css encapsulation-
+
+Parent commonent css not able to applied to parent commonent.
+
+Child commonent css  not able apply to parent component.
+
+Global styles.css is applied on both child and parent commonent.
+Repeating Data with ngFor
+<event-thumbail #thumbails *ngFor="let event of events" [event]='event'></event-thumbail>
+*ngFor- it is structural directive- Structural directives are different from other directives
+
+
+
+Handling Null values with Safe Nagivation Operator.
+When u r binding to objects with interpolation
+what is if event object we are binding to is undefined
+what a we do  you do if event might be null? thats where the safe nagivation operator comes in.
+we need to add ? mark like - {{event?.name}}
+it is safely handling undefined objcets
+we can use safe nagivation operator on multiple objects -like- {{event?.location?.address}}
+
+
+
+Hiding and  showing content with ngIf-
+ngIf is a built in structural directive that allows us to show content only when an expression evaluates to true.
+<div *ngIf="event?.location">
+<span>Location: {{event?.location?.address }}</span>
+</div>
+<div *ngIf="event?.onlineUrl">
+</div>
+It is does not rendered data in the DOM
+It is completely removing it from the DOM can expensive.
+
+Hiding and showing content with ngSwitch-
+
+how to change the visibility of elements using ngIf and by binding to the hidden property to DOM element.
+
+<div [ngSwitch]="event?.time">
+<span [ngSwitchCase]="'8:00 am'">
+Early Start</span>
+<span [ngSwitchCase]="'10:00 am'">
+Late Start</span>
+<span *ngSwitchDefault>
+Normal Start</span>
+</div>
+
+Styling Components with ngClass
+Class binding are good if you are waiting to toggle a single class and
+ngClass is better for if you want to toggle multiple classes.
+conditionaly add css class with angular
+
+1) <div [class.green]="event?.time === '08:00'">---- this is special type of  binding called a class binding and it is parsed by angular.
+we want add multiple class to div based on condition as like below-
+2) <div [ngClass]="{green: event?.time === '8:00 am', bold: event?.time === '8;00'}">
+attached green and  bold class based on conditions-
+
+3) Actually we can also add class with calling function in the component.
+
+<div [ngClass]="getStartTimeClass()">
+
+getStartTimeClass(){
+	//const isEarlyStart=this.event  &&  this.event.time ='8:00 am';
+	//return {green:isEarlyStart, bold:isEarlyStart}
+	
+	we can return string or array of string
+	
+	if(this.event  &&  this.event.time ='8:00 am'){
+		return 'green bold'; //['green',bold];
+	}else{
+		return '';//[]
+	}
+}
+
+Styling commonents with ngStyle-
+you can  also apply a single style to an element using style binding.
+1) <div [style.color]="event?.time === '08:00' ? '#0033000' : '#bbb' ">
+2) <div [ngClass]="{'color': event?.time === '8:00 am'? '#0033000' : '#bbb',font-weight:event?.time === '8:00 am'? 'bold' : 'normal'}">
+
+
+Hiding Content with the [Hidden] Binding-
+<div [hidden]="!event?.location">
+		<span>Location: {{event?.location?.address }}</span>
+</div>
+
+
+Why we need services and dependency injection comes in.
+Services allow u to define bussines logic in a separte file and then inject whatever 
+service we need whenever we need it.
+
+To create Routes concept-
+
+need to write <router-outlet></router-outlet> - to add event pages into router-outlet file.
+then create routes.ts - add all routes into routes.ts page-
+import {routes } from '@angular/router'
+
+Accessing route parameters-
+import { ActivatedRoute } from '@angular/router'
+create a instance in the constructor and use that instance in the constructor
+constructor(private activated:ActivatedRoute)
+in function we get parameters like that -
+this.activated.snapshot.params['id'];
+
+Linking To Routes-
+<a [routerLink]="./events">create events</a>
+<a [routerLink]="['./events']">All events</a>
+<a [routerLink]="['./events',1]">create events</a>
+
+Navigating from code-
+inject
+import {Router } from '@angular/router'
+
+create instance in the constructor
+then use like below-
+this.router.nagivate(['./events']);
+
+Guarding Against Route Activation-
+we use canActivate - for check either route activate or not
+we create service and  pass to canActivate in routes file
+
+{path:'events', commonent: EventDetailsComponent, canActivate: [EventRouteActivator] }
+in routes-
+
+{path:'events', commonent: EventDetailsComponent, canDeactivate: [canDeactivateCreateEvent] }
+
+In Appmodules in providers-
+{provide: 'canDeactivateCreateEvent',useValue:'checkDirtyState'}
+
+export  function checkDirtyState(component: CreateEventComponent){
+if(commonent.isDirty){
+		return window.confirm("You have	 not saved this event,Do want to cancel thpage");
+ }else{
+ return true;
+ }
+}
+
+
+Pre-loading Data for Components-
+resolve allow you to prefetch necceesary data for the commonent or to do other checks prior to loading commonent.
+
+create subject in RXJS implemetation in service class-
+import { Subject } from 'rxjs';
+
+  getEvents():Observable<any> {
+    let subject = new Subject<any>()
+    setTimeout(() => {subject.next(this.EVENTS); subject.complete(); }, 3000)
+    return subject
+  }
+ 
+then create resolver service to subscribe event service data and pass to component as parameters-
+import { ActivatedRouteSnapshot, CanActivate, Router } from "@angular/router"
+import { Injectable } from "@angular/core"
+import { EventService } from './event.service'
+import { EventDetailsComponent } from './event-details.component'
+
+@Injectable()
+export class EventsListResolver implements Resolve<any> { 
+  constructor(private eventService:EventService) {
+
+  }
+
+  resolve() {
+    return this.eventService.getEvents().map(events => events)
+  }
+}
+
+then routes  call to resolver service to get all events and pass to event properties-
+  { path: 'events', component: EventsListComponent, resolve: {events:EventsListResolver} },
+we can get that data into eventdetails page and displayed it.
+  this.events = this.route.snapshot.data['events'];
+  
+  
+  styling Active links-
+  add css to active links for  that we need to add simple routerLinkActive	 to hyperlink
+			<a [routerLinkActive]="active" [routerLinkActiveOptions]="{exact:true}">
+			and  write active class inside in css div
+we 	routerLinkActiveOptions- only get applied if the route exactly matches /eventService
+		
+		
+Lazily Loading Feature Modules-
+load other in main routes file-
+{path:'user', loadChildren: './user/user.module#UserModules'}
+
+loadChildren - path to the file-'./user/user.module'
+
+How to organise code into modules-
+ Organizing your exports with Barrels-
+ if we take a look at our app module. it has a quite a long list of imports 
+ and most of them comming from  events folder
+ we can simplify this a little bit by exposing all of the imports inside the events directory from single index file that we can then just import with signle import file.
+ This is referred to as creating barrels.
+		
+  
+
+  
+  
+ Collecting Data with Angular Forms and Validation : Using Multiple Validators in Reactive Forms -
+Pass array of validators to form controls-
+ 
+this.firstName = new FormControl(this.authservice.ICurrentUser.firstName, [Validators.required, Validators.pattern('[a-zA-Z].*')]);
+
+Collecting Data with Angular Forms and Validation : Diving Deeper into Template-based Forms
+
+Customn validate function return null if validation is valid and validation is invalid
+
+
+Contentg Projection - 
+
+Content projection is  feature where you can have a component with some kind of visual wrapper.
+
+Reusing Components with Content Projection : Content Projection
+
+<ng-content></ng-content> -  this elemenmt is tell to angular whatever content exist inside in the my component which we can see in back here in session list.
+
+we can access div html data from .class and #id
+<ng-content select=".title"></ng-content>
+<ng-content select=".body"></ng-content>
+
+<div class="title">
+</div>
+<div class="body">
+</div>
+
+
+
+we will give this 'div' an attribute of well body
+we can access inner html from attributes of  div body
+
+<ng-content select="[well-title]"></ng-content>
+<ng-content select="[well-body]"></ng-content>
+
+<div well-title>
+</div>
+<div well-body>
+</div>
+
+div attribute is more better than class or ID selector-
+it doesnot  give us a potential conflict with css class or ID
+
+Pipe vs Filters-
+
+A1 - filter-
+angular 1.5 have Filter which can perform formatting and sorting ,filtering but therte 
+is problem to sorting and filtering with job-
+it format the data is very good.
+
+Pipe -
+it handle the formating of data but not sorting and filtering lists of data.
+Pipes in Angular allow us  to displayed data formatted in specific way.
+
+Using Built-In Pipes-
+it used for format data that you want.
+it is good of format the displayed data so angular have some build-in pipes -
+like - data,number,uppercase
+for example 
+{{ title | uppercase }}
+{{ title | date:"longDate" }}
+{{ title | date:"shortDate" }}
+{{ title | date:"y/M/d" }}
+{{ price | currency:'USD' }}
+
+Understanding Angular's Dependency Injection : Using Angular's InjectionToken
+Angular provides a mechanism for us to create a key or token that we can use in dependency injector without creating class
+and that is called the injection token.
+The Injection token's job is simply create a token used for dependency injection registry
+
+
+Creating Directives and Advanced Components in Angular : Implementing the Session Search
+

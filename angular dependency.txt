@@ -1,0 +1,342 @@
+when instance of employee component is created then  angular injector create instance of employee service
+and inject that into the constructor
+
+export class EmployeeListComponent implements OnInit {
+	this._employeeservice:  EmployeeService
+	constructor(_employeeservice: EmployeeService){
+	this._employeeservice=_employeeservice;
+	}
+}
+
+we assign injected instance to the private field variable 
+and then we use private field for call servicess method
+
+angular injecttor create and inject the service and where component need the service instance
+
+how does know angular injector  about employee services-
+to tell the to angular injector about employee service we  need to register it in provider property of @ngModule decorator of App.module
+we can register service at  component level or module level
+
+here  we have employee list component we know this component has dependency on  employeeservice	
+so compoent specify its dependency
+by using constructor parameter by this-
+and then angular injector looks at  constructor and say u have dependency on employeeservice
+so lets me create instance of that dependency and  inject into the constructor.
+
+angular injector need to know about service so we can tell to angular injector about service for that 
+we need to register service in app.module or self component
+
+What is dependency Injection-
+its coding pattern in which class receive its dependencies from external sources rather than creating themself
+
+Why should we use Dependency injection and benefits it provide- 
+example - computer assembly
+
+this code difficult to maintain over time.
+instances  of dependencies created by a class that needs those dependencies are local to class 
+ and cannot share data and logic
+hard to unit test
+
+1) this code difficult to maintain over time.
+export class computer{
+	private processor: Processor;
+	
+	constructor(processor: Processor){
+	this.processor=processor;
+	
+	}
+}
+export class processor{
+		constructor(speed: number){
+		}
+}
+
+Notice with DI -the computer class is not creating the  instance of the processor class.
+Since now an external source (i.e angular injector) is creating the dependency instance,
+ the computer class need not change when the procesor class changes.
+
+2) intances of dependencies created by a class that needs those dependencies are local to class 
+and cannot share data and logic
+
+if we have 10 component then we need to create 10 instance of service and use it in.
+and these instance are local to component so we data and logic it has cannot be share to another compolnment
+
+but in angular if we use DI, the angular injector provides a singleton
+
+lets we have component_1,component_2,component_3,component_4
+component_1 which need instance of user service  so compoent it self not crteating instance of that service because we use DI
+so angular injector create instance and inject the service instance.
+
+1st thing angular injector does you need instance of user service so let me check if we have already instance of service if not
+it create and pass to component_1 then   component_2 need user service instance then angular injector sends alreaady created instance to component_2
+
+3) hard to unit test
+
+DI Benefits -
+ Create Application that are easy to write and maintain over time as application envoles
+ Easy to share data and functionality as angualr injector provides a singlton
+ easy to write and maintain unit test as dependencies can be mocked 
+ singleton means angular provide single instance of services-
+ if we create local service instance then
+ Local instance can not to use for share data 
+ 
+ Angular Injector-
+ Root App Injector- App Component - Comp x --- Comp Y
+						|				|
+						|				|
+						|				|
+						Comp A		Comp Z
+	If we register our service at root app injector - that services available to all components including lazy loaded module components
+	Services are available to all of application of components
+	
+App Component - if register at app component level then Service available to all components except lazy loaded module components
+Comp A - Service available only to Component A  but not Components X, Y & Z
+Comp X - Service available only to components X,Y & Z but not to component A.
+
+Angular Root Injector - 
+every application have Root Injector at aplication level.
+and Injector at every  component level.
+register service at root injector we use providers of NgModule 
+register service at component injector we use providers of @component
+we can use any modules providers property to register service with the angular root injector 
+that module is root module of that service 
+
+Promise in angular 2
+by default build in Http service  return an observables
+ 
+ To Use promise we need to import toPromise Operator
+ import 'rxjs/add/operator/toPromise'
+ mention return type of method is Promise<IEmployee>
+ .map((response: Response) => response.json()<IEmployee>)
+ .toPromise()
+ .catch(this.handlePromiseError)
+ 
+ handlePromiseError(error: Response){
+	console.error(error);
+	return throw(error);
+ }
+ 
+ 
+ handleError(error: Response){
+	console.error(error);
+	return Observable.throw(error);
+ }
+ 
+ When we use promise to get data from http service then in the component 
+ we need to subscribe that data by then() method 
+ as per follows - 
+ then(
+	(employeeDate) =>{
+		this.employee=employeeDate;
+	}
+ ).catch((error) =>{
+	this.statusMsg = 'problem with the service';
+	console.log(error);
+ })
+ 
+ Promises vs Observables - 
+ 
+ Promise - 
+ 1) it Emits a single value
+ 2) promise have two parameter where request successfuly completed or failed that is 
+ completed and rejected.
+ 3) Not Lazy.
+ promise in not lazy - either u have then() method service call is issued over the network
+ 4) cannot be cancelled 
+ 
+ Observable -
+1)  Emits multiple values over period of time
+  we can think as an observable like a stream which emit multiple values over period of time and same callback function called each item emitted.
+  so with observable we can use same API to handle async data either data emitted as single value or multiple value over period of time.
+  
+2) Observable have three parameters that (next,error,completed)
+ next - it has multiple values over period of time so next callback function called for the each item emited.
+ 
+3) - Lazy. An Observable is not called until we  subscribe to the observable using the subscribe() method
+4) can be cancelled by using the unsubscribe() method
+5) Observable provides operators like map, forEach, Filter, reduce, retry
+
+ 
+ 
+Observable Retry On- 
+if there is error in the observable then we can resubscribe or retry the observable while retry also 
+we can show attempt no after 3 or 4 times for checking for retry for observable then later we need to 
+unsubscribe for the application.
+for implements in component then 
+we need to import  retry rxjs operator
+ import 'rxjs/add/operator/retry'
+ 
+ .retry() // it is used to retry it on multiple time
+ also retry we can specify no of times to retry observable in retry(4) function
+ 
+ retry activity is need done after some time then  we can use retryWhen operator with delay() operator aslo
+ import 'rxjs/add/operator/retryWhen'
+ import 'rxjs/add/operator/delay'
+ 
+ retryWhen((err)=>err.delay(1000)) - it s retry done after 1 second
+ 
+ retryWhen((err)=>{
+		return retry.scan((retryCount) =>{
+				retryCount+=1;
+				if(retryCount < 6){
+						this.statusMessage="Retrying....Attempts"+retryCount;
+						return retryCount;
+				}else{
+					throw (err);
+				}
+		},0).delay(100)
+ })
+ 
+ Unscubcribe Observable-
+ 
+for that we neeed to import ISubscription type from rxjs/Subscription
+
+import { ISubscription } from 'rxjs/Subscription';
+subscription: ISubscription; // create property of ISubscription
+we use this property to hold on subscription of observable
+
+this.subscription = this._employeeservice.geEmployecode();
+
+oncancelSubsssptionBtn(){
+this.status="request is canelled";
+this.subscription.unsubscribe();
+}
+on btn show or not after unsubscribe the request then - 
+*ngIf="!subscription.close()"
+
+
+Diffrences in Angular JS , Angular 2  and Angular 4
+google has release angular version as below
+
+Angular JS - released in Year 2010
+Angular 2 - released in Year 2016
+Angular 4 - released in Year 2017
+
+Diffrences between AngularJS and angular 2 
+
+Angular 2 is not simple upgrade of angularJS
+angular 2 is completely rewritten from the ground up
+angular JS  application revolve around concept of controllers,view and to glue controller and view in application we use $ scope oprator.
+angular 2 is entirely component based it means we create set of independent component and loosly couppled components and put them together to create angular 2 application
+component best used for code reuse exmple like rating component
+
+Angular 2 is 5 times faster as compared to Angular JS.
+Angular JS was not built for mobile devices, where as angular 2 on other hand is designed from ground up with mobile support in mind 
+with angular 2 we have more language choices like -( javascript ,type script ,Dart,PureScript)
+
+angular JS and angular 2 is two different framework because API,package are completed different.
+ also way of code written is different, package are also different.
+
+Diffrences between Angular2 and angular 4
+ 1) Changing from angular2 to Angular 4 and even future versions of angular won't be like changing from angular 1
+ angular 4 is simple next version of angular 2 - there underline concept and pattern are some
+ so you can easily switch  from angular 2 to angular 4
+ 
+2) angular 4 is most backwords compatible with angular 2.0 for most of application
+
+What has changed and what is new  in angular 4 - 
+some under the hood changes to reduce the size of AUT(ahead time ) compiler generatged code 
+ 
+ 3) Typescript 2.1 and 2.2 compatibility
+ 
+ angular 2 supports only typescript 1.8 vertsion and angular 4 is supported to typescript 2.2 and 2.1
+ 
+ 4) Animation features as pulled out of @angular/core and are moved into their own package
+ 5) new if/else style syntax with *ngIf  structural directive 
+ 
+ what happened to Angular 3-
+ expect router library all other library is 2.3 but router library has version v3.3.0
+ so due to this disalignment in router package version, angular team decided to go straight for angular 4
+ it help to maintain versio and avoid the confusion in version point 
+ 
+ 
+ Http Service-
+  1st ) import { HttpModule } from '@angular/http'
+  
+  2nd step ) 
+  
+  
+ What is an Observable - 
+as an Observable is an  async pattern and this pattern have Observable and Observerer 
+Observable - emit data items on notification over period of time.
+Observerer (subscribers) - it can be subscribe to the observable.
+
+when subscribing the observerer specify the callback functions and these callback function of observerer also called as subscriber
+The callback function is notified when the Observable emits data
+Observers subscribe to Observable with callback function 
+Observable can have multiple observerer anybady who are interested in data emitted by observable can subscribe the observables.
+
+for example 
+suppose in employee service getemployee() method return a observable so it become observable and 
+component  who required data from employee service from getemployee() method then its called observerers
+so any component need the employee data is going to called Observerers 
+
+for EmployeeListComponent subscribe to the Observable returned  by angular EmployeeService
+
+ngOnInit(){
+	this._employeeservice.geEmployee().subscribe(employeeData => this.employees = employeeData);
+}
+
+onNext  - The  Observable calls this method whenever the Observables emits an item. 
+the emitted item is passed as parameter to this method 
+
+OnError - The Observable call this method  if there is an error
+
+OnCompleted - the Observable call this method after it has emitted all items i.e - after it has called onNext final time 
+
+Interface in angular-
+
+Interface is defines contract that is shape or structure of the API 
+u know n typescript is strongly typed language this mean every class property and method parameter in every typescript class has type associated with it.
+interface used for create custom object for business objects.
+
+- Use Interface keyword to create an  interface 
+- itg is common  to prefix the interface name with capital letere I, however some interfaces in angular  does not have the prefix for example - OnInit interface
+- Interface member are public by default and does not require explicit access modifiers. it is a compile time error to include an expliicit access modifier .
+- use ?
+- Use Implements keyword to make class implement an interface 
+
+Angular Component LifeCycle Hooks -
+A component has a lifecycle managed by angular.
+Angular 
+- Creates the component	
+- Renders the component
+- Creates and renders the component children.
+- Checks when component data-bound properties change and 
+- Destroys the component before removing it from DOM 
+
+The 3 most comman used lifecycle hooks
+
+ngOnChanges - Executes, Every time the value of input property changes. The hook method receives a SimpleChanges object containing
+ current and previuous property values. this is called before ngOnInit
+ 
+ ngOnInit - Executes after construtor and after ngOnChanges hook for the first time. it is most commonly used for component initialisation
+ and retrieving data from a database.
+ 
+ ngOnDestroy - Executes  just before angular destroys the component and generally used for performing clean up
+ 
+ 3 Simple steps to use the life cycle hooks -
+ 
+Step 1 : Import the life Cycle Hook interface 	
+	Import { OnInit } from '@angular/core'
+
+Step 2: make component class implement  the life cycle hook imterface 
+	export class SimpleComponent implements OnInit 	
+	
+Step 3: Write the implemention code for the life cycle interface method 
+	ngOnInit(){
+		console.log(" OnInit Life Cycle Hook");
+	}
+ 
+
+html attribute vs dom property -
+ 
+DOM - stands for Document Object Model. When a browser loads a web page, the browser creates a Document Object Model of that page.
+DOM - contains the HTML elements as objects, their properties, methods and events and it is a standatard for accessing, Modifying,
+adding or deleting HTML elements.
+
+Angular Attribute binding-
+if we want to bind html element properties
+for example - for <span> properties does not have corresponding DOM property in such situation 
+we needto bind html element attribute directly
+

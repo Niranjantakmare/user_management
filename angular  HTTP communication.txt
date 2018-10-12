@@ -1,0 +1,117 @@
+Role of RxJS - 
+it is separate Javascript Library for reactive programming with observables.
+Angular is built to work with and is dependent on RxJS.
+Http client class used to make heavy use of Observable.
+One of the nice things about working with  responses as observables is the number of RXJS operator available to help you manipulate the data in the response. 
+Operator are effectively funstions that operate on data on the observables and they also return	 observable so they can chained together.
+
+5.5 RxJS-
+the version supports a new and improved syntax for operators known as pipebale operators.
+Angular apps are dependent on RxJS
+Installed with apps created by CLI
+Most HttpClient methods return Observable.
+They represent a stream of data that may arrive over time.
+
+
+What is Rest sercive-
+representational state transfer.
+Web api or Http api
+Uses HTTP  verbs to specify crud operations.
+URL conventions address individual as collection of resources.
+HTTP response codes indicate success and failure of server action.
+
+Create
+Post method
+if sucessful, it return HTTP 201 created.
+
+Read
+GET method
+if sucessful, it return HTTP 200 created.
+
+Update
+PUT method
+if sucessful, it return HTTP 204 created.
+
+Delete
+DELETE method
+if sucessful, it return HTTP 204 created.
+
+
+
+Subscribing to Observable-
+	the methods are exist in angular HttpClient class that you will most often use to interact with REST services all return Observable.
+	it is most  fundamental construct in RxJS and they represent a set of  
+	values that can be delivered over time.
+	
+	getAllBooks():Observable<Book[]>{
+	return this.http.get<Book[]>('/get/books');
+	}
+	
+ if you want receive the results from observable,then you must subscribe to the observable.
+ so that done by calling method name subscribe.
+ as follow-
+ 
+ this.dataservice.getAllBooks().subscribe(
+	(data:Book[])=> this.allBooks = data;->its function call when call is sucessful
+	(err: any) => console.log(err),-> its function call when service call in unsuccessfuly.
+	() => console.log('All done getting books') -> its execute function when observable is done, providing all of the data it's going to provide. this is basically a completion handler.
+	
+ );
+ 
+Using Rxjs operator-
+Operators are really just bits of code that operate on observables and return an observables,
+you can multiple operators together to perform complex tranformations on your data before returning it to your components.
+
+
+Interceptors-
+They allow you to write a small bit of code and configure. 
+it in single place and then have it applied to all of your HTTP requests and responses.
+I am naturally kind of lazy.
+
+What is Interceptors-
+it is Service.
+its implemented by the httpInterceptor interface.
+Resolvers are implemented as services that implement the resolve interface.
+Interceptors are services that implement the HttpInterceptor interface.
+Manipulate HTTP requests before they are sent to the server.
+Manipulate http reponses before they are returned to your app.
+
+Uses for Interceptors-
+When you are creatinig your HTTP request, you have lot of freedom and control the customise them to look exactly,
+how you them to the sent to the server.
+The power of interceptors is that they give you one place to apply some of custom bits, 
+so that you don't have to do it over and over for every request in your application.
+
+They  give flexibility to transform your data into exactly shape you need it, 
+  which can be very useful working with thirdparty service that  may not return data in
+exactly the format you would prefer.
+the power of operators offer when you need to transform and manipulate data in your observables.
+
+1) Adding headers to all requests.
+2)Logging
+2)Reporting progress events
+3)Client side caching
+
+Resolvers-
+Resolvers allow you fetch data before navigating to a new route.
+all of http requests have been made after a new route was activated.
+fetch data before navigating.
+it is prevent presentation of   empty component.
+it is prevent routing to components with erlrors.
+resolver allow you to handle the error and redirect to you approprate components.
+they provide better user experience.
+Resolver is feature of angular router.
+
+how to retrieve a collection of resources form a RESTful  web service using angular HTTPClient.
+this.http.get<Book[]>
+the data returned in the body of HTTP response will be array of object objects.
+so will specify book array as generic parameter for the get method.
+
+ 1) Angular provides Resolve interface with resolve method declaration.
+2)  To create a Angular Resolve guard, we need to create a class by implementing Resolve interface. 
+ 3) Resolve guard is used in the scenario where before navigating to any route we want to ensure 
+ whether there is data available or not. If there is no data then it has no meaning to navigate there. 
+4)  It means we have to resolve data before navigating to that route. Here comes the role of Angular Resolve guard.
+ To use Resolve guard we need to create a class by implementing Resolve interface and define resolve method. 
+ The resolve method can return Observable or Promise or a synchronous value
+ 

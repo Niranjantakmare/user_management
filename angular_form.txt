@@ -1,0 +1,85 @@
+Validation Classess in Angular 2 -
+We need attach validation classes to field of the form.
+Once form is create the all the fields are marked as ng-untouched.
+If form value chanegd then it become as
+ng-touched.
+ng-pristine
+ng-dirty
+ng-valid
+ng-invalid
+
+
+Validation classes in action-
+Access all class of form field by {{ firstName.className}}
+- it return ng-untouched,ng-touched,ng-valid
+ng-prestine-ng-dirty
+ng-untou-ng-touched
+ng-valid-ng-invalid
+
+Classes and Associated ngModel Properties.
+- we have untouched and touched properties...we are simply remove ng dash.
+ng-Model properties-
+pristine,dirty.
+valid,invalid
+
+#firstname-template reference variable to the input tag
+<input #firstname >
+we can pick up css classes from input
+#firstName="ngModel" 
+This ngModel directive gets exported as string ngModel.
+
+To access form field status-
+{{ firstName.dirty }}
+
+
+Showing Error Message-
+<div ngIf="firstName.invalid && firstName.dirty" class="alert alert-danger">
+Firstname is required.
+<div>
+
+we can use ngIf="firstName.invalid && firstName.touched"
+
+
+
+Styling control for Errors-
+[class.has-error]="firstName.invalid && firstName.touched"
+<div class="form-group" [class.has-error]="firstName.invalid && firstName.touched">
+</div>
+we can easily add a class or remove a class from dom elements by using this binding.
+its property bindgin so you use squres brackets.
+
+languages=['Engilsh','marathi','Hindi'];
+model=new Employee('','',false,'','default');
+
+hasPrimaryLanguageError=false;
+
+ValidatePrimaryLanguageError(value){
+if(value==='default'){
+this.hasPrimaryLanguageError=true;
+}else{
+this.hasPrimaryLanguageError=false;
+
+
+}
+}
+
+< select class="form-group" [class.has-error]="hasPrimaryLanguageError"
+(blur)="ValidatePrimaryLanguage(primaryLanguage.value)"
+(change)="ValidatePrimaryLanguage(primaryLanguage.value)"
+[(ngModel)]="model.primaryLanguage"
+
+Form-level validation-
+we are add template reference variable on form level.
+we can access this ngFOrm directive, Now with our template reference variable.
+
+<form form="ngForm">
+we can check form level validation with - <h3>{{ form.valid }}</h3>
+
+Disabled the submit form-
+<button class="btn btn-primary" type="submit" [disabled]="form.invalid">Ok<button>
+
+<input ngModel >-no binding
+<input [ngModel]="model.firstName"> -one way data binding 
+<input [(ngModel)]="model.firstName"> -two way data binding 
+Model -{{ model | json}}
+Angular -{{ form.value }}
