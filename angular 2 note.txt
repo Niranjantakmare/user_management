@@ -1,0 +1,195 @@
+Passing Parameters to a Route-
+1) we sometimes need to pass parameters to route.
+ for example- product details of particular product.
+<a [routerLink]="['/products',product.productId]">
+</a>
+
+{ path: 'products/:id', component: ProductDetailComponent }
+
+here set the router link and pass in required parameter.
+To display the appropriate product, the product detail component reads this parameter from URL. 
+it then uses the parameter to retrive the appropriate product and display it in the view.
+
+To get parameter from URL we use the ActivatedRoute service provided by the router.
+We want an instance of the service so define it as dependency in our constructor.
+
+Constructor(private _route: ActivatedRoute) {
+console.log(this._route.snapshot.paramMap.get('id'));
+}
+
+This line of code defines variable called _route and assigns it to the instance of the activated
+route provided by angular service injector then we use the instance of the ActivatedRoute service
+to get the desired parameter.
+There are two different ways to get the parameter.
+we could use a snapshot or we could use an observable.
+Use the snapshot approach if you only need to get the initial value
+of the parameter.
+
+If you expect the parameter to change without leaving the page.
+then Use an Observable.
+for example-
+If we had a next button on the product detail page to display the next product,
+the URL will change to next products id so you want to use observable instead
+
+We then set ActivatedRoute as dependency by defining it as a parameter to constructor function.
+ActivatedRoute instance is then injected into component class.
+
+Activating a Route with Code-
+when we would you want to navigate with code instead of the router Link directive in a template.
+one  example-is  a save button where you need to exevute some code to save data and then route.
+To route with code we use the router service.
+
+we define a dependency on the router service using a constructor parameter.
+we import the router  service the angular router.
+router instance is then injected into this component class.
+
+We use this router instance to activate a route.
+here we define a method that we can call from the template based on user action./
+the code uses the navigate method of router service and passes in the same link parameter array we use when
+binding the router link.
+
+Protecting Routes with Guards-
+we want routes only accessible to specifc users such as an adminitrator 
+for example - we want the user to confirm a navigation operaion such as asking whether to save before navigating away from edit page
+for that we use guards.
+angular provides several guards including
+
+CanActivate -  guard navigation to a route, 
+CanDeactivate - guard navigation away - Guard navigation from a route
+Resolve  - Pre-fetch data before activating a route.
+CanLoad - prevent asynchronous routing.
+
+We build guard that prevents navigation to product detail route unless a specifc condition is true.
+we build guard to protect the product detail route so we add  the guard to the product detail route.
+We add canActivate and set it to an array containing guard to execute before route is activated.
+we want to build a guard that prevents navigation to the product detail component if the provided URL parameter is not valid.
+
+commad for create service-
+ng g s products/product-guard.service -m app.module
+
+- -m for  register service in app.module.
+
+We need to check the route URL and ensure that the id passed in is valid.
+CanActivate has parameter that gives us the activated route snapshot. 
+the activated route snapshot contains the information about a route at any perticular moment of time.
+
+import { CanActivate, ActivatedRouteSnapshot } from '@angular/router';
+export class ProductGuardService implements CanActivate {
+
+  constructor() { }
+
+  canActivate(route: ActivatedRouteSnapshot): boolean {
+    let id= +route.url[1].path;
+
+    if (isNaN(id) || id < 1) {
+       alert('Invalid product Id');
+       this. router.navigate(['/products']);
+       return false;
+    }
+  }
+}
+
+Angular Module-
+
+What is  angular module-
+1) an angular module is a class with an NgModule decorator.
+2) To organize the pieces of our application arrange them into cohesive blocks of functionality and extends our application with capabilities from external library.
+3) angular provides the environment for resolving the directives and pipes in our component's template.
+4) Aggregate  and re-export
+
+Organize of our angular application- 
+1) angular module declares each component,directive and pipe that it manages.
+2) Every component, directive and pipe we create belongs to angular module.
+3) An angular module bootstrap our root application component, defining component needed to display our first template.
+4) An angular module can export components, directives, pipes and even other angular modules. and making them available for other modules to import and use.
+5) an angular module imports other angular modules.
+6) Angular module can register service providers with the angular injector and making them available to any class in the application.
+
+Bootstrap Array-
+Bootstrap array of the ngModule decorator defines the component that is the starting point of the application.
+This component is loaded when application is launched.
+Every application must bootstrap at least one component that root application component.
+it used only in app module
+
+Declarations array-
+we use declarations array of the ngModule decorator to define the components, directives and  pipes that belongs to this angular module.
+only declare other classes ,services or modules to the declarations  array.
+never re-declare components, directive or pipes that belong to another module.
+All declared components, directives and pipes are private by default.
+they are only accessible to other components, directives and pipes declared in the same module.
+angular modules provides template resolution environment for its components templates.
+
+Exports Array-
+the exports array of ngModule decorator allows us to share an angular modules components, directives and pipes with other modules.
+1) Export any component,directive or pipe if other components need it.
+2) Re-export modules to re-export their components, directives and pipes.
+3) We can re-export somthing without importing it first.
+4) never export a service because-
+    services are added to the providers array of an angular module are registered with root application injector
+	making them available for injection into class in the application.
+	so ther is no point of exporting them.they are already shared throughout the application.
+	
+	Imports Array-
+	Angular module  can extended by importing capabilities from other angular modules.
+	it allows us to import supporint modules that export components, directives, pipes.
+	we use that component,directive,pipe within templates of components that are declared in the modules.
+	we can import -
+	   @angular module
+	   3rd party module
+	   module
+	   Route module.
+	1) Importing a module makes available any exported components,directives and pipes from that module.
+	2) only import what this module needs.
+	3)don't import anything this module doesnot need.
+	4) importing a module does not provide access to its imported modules.
+	
+	Providers Array-
+	any service provider added to the providers array is registered at root of application.
+	Don't add services to the providers array of shared modules.
+	there should only be one instance of service that is an application wise singleton.
+	so services should not be included  in providers array for module that meant to be shared.
+	
+	Instead consider building CoreModules for services and importing it once in the AppModule.
+	This will help ensure that services are only registered one time.
+	
+	Routing guards must be added to the providers array of angular module.
+	guard service provider must be defined at the module level so that router can use the service during navigation process.
+	
+	Feature Modules-
+	Using feature modules helps  us partition our application into logical grouping with separation concerns.
+	Broser module must be imported in root application module.
+	CommonModule exposes the ngfor and ngif
+	
+	
+	
+	ng new-
+	cmd- ng new app_name
+	
+	code . open folder in vs code
+	Polyfills - add code to allow functionality written for modern browser to work in older browser.
+	by default it is  set to evergreen browser as stated here.
+	if you need to target older browsers,there are comment in this file need to removed.
+	
+	test.ts - it  is  set up for  testing.
+	
+	ts config for- typescript configuaration.- there are two files.
+	
+	one for compilaing test files
+	second one for test specifications file.
+	
+	 ng serve- run your application bby ng serve.
+	 clear the terminal screeen - clr or cls
+	
+	
+ What Is a Component? 
+	component also has metadata which provides additional information about the component to angular.
+	it is  this metadata that defines this class as an angular component.
+	metadata is  defined with decorator.
+	
+ Creating the Component Class 
+	A class is construct that allows us to create a type with properties that 
+	the data elements and methods that provides functionality.
+
+
+ 
+ 
